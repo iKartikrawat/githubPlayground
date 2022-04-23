@@ -17,3 +17,9 @@ status:200 means fetch has been completed and keys repos and commits will have a
 status:202 means fetch is in progress for current user
 
 status:203 means fetch is not yet started but user is added to the queue
+
+
+TO DO:
+Better documentation,
+SetUp Error Handling,
+Use routers and middlewares to secure all endpoints
