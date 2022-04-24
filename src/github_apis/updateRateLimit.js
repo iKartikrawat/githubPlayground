@@ -1,13 +1,9 @@
 const { request } = require("https");
+const { ExternalApiRequestError, UnhandledError } = require("../customError");
 const { setRateLimit } = require("./rateLimiter");
 
 const githubApiHost = "api.github.com"
 
-
-/* 
-
-Api to fetch and update the rate limit
-*/
 function updateRateLimit() {
     return new Promise((resolve, reject) => request(
         {
@@ -21,8 +17,8 @@ function updateRateLimit() {
         (response) => {
 
             let status = response.statusCode;
-            if (status != "200")
-                throw new Error("Something went wrong!");
+            if (status != 200)
+                return reject(new UnhandledError("Unknown Status Code: " + statusCode + " in google ratelimit Api."));
 
             let data = '';
 
@@ -37,15 +33,13 @@ function updateRateLimit() {
                 () => {
                     let quota = JSON.parse(data).resources.search;
                     setRateLimit(quota.limit, quota.reset, quota.remaining);
-                    console.log("rateLimitUpdated");
                     resolve(true);
                 }
             );
             response.on(
                 'error',
-                (error) => reject(error)
-            );
-
+                (error) => reject(new ExternalApiRequestError("Google rate_limit",error.message))
+                );
         }
     ).on(
         'error',

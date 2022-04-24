@@ -40,12 +40,26 @@ function addNewReq(path, next) {
         return next(path);
     else
         return new Promise((resolve) => {
-            setTimeout(async () => { resolve(await addNewReq(path,next)) }, (canReq + 1) * 1000)
+            setTimeout(async () => { resolve(await addNewReq(path, next)) }, (canReq) * 1000)
         });
 };
+
+function updateResetTime(resetTime, remaining) {
+    if (!resetTime)
+        return;
+    resetTime = Number(resetTime);
+    if (nextResetTime < resetTime) {
+        nextResetTime = resetTime;
+        remaining = Number(remaining);
+        if (remaining < totalRemaining)
+            totalRemaining = remaining;
+    }
+
+}
 
 
 module.exports = {
     setRateLimit,
+    updateResetTime,
     addNewReq
 }

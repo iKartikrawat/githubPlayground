@@ -7,8 +7,8 @@ To fetch all public repos and commits of a user you need to simply,
 call get API on path "/getGithubUserData"
 passing username as a query parameter
 
-example get request
-http://localhost:3000/getGithubUserData?username=iKartikRawat
+example request
+GET http://localhost:3000/githubUserData?username=iKartikRawat
 
 the result for query may come any of the following,
 
@@ -18,8 +18,6 @@ status:202 means fetch is in progress for current user
 
 status:203 means fetch is not yet started but user is added to the queue
 
+status:403 means a bad request
 
-TO DO:
-Better documentation,
-SetUp Error Handling,
-Use routers and middlewares to secure all endpoints
+

@@ -10,7 +10,8 @@ const getUser = async(username) =>
         }
     }, {
         projection: {
-            _id: 0
+            _id: 0,
+            error:0
         },
         returnDocument: 'after',
         upsert: true
@@ -27,11 +28,15 @@ const setUserHasDone = async (username) => {
     return updated.modifiedCount > 0;
 }
 
-const setUserHasError = async (username) => {
-    let updated = await userscol().updateOne({ username }, { $set: { hasError: true, inProcess: false, hasDone: true } });
+const setUserHasError = async (username,err) => {
+    let updated = await userscol().updateOne({ username }, { $set: { hasError: true, inProcess: false, hasDone: true, error:err } });
     return updated.modifiedCount > 0;
 }
 
+/* 
+fetch all Users that are in progress
+ */
+const getUsersInProcess=async()=>await userscol().find({inProcess:true},{projection:{_id:0,username:1}}).toArray();
 
 /* 
 finds the next user to process
@@ -40,6 +45,7 @@ const getNextUserToProcess = () => userscol().findOne({ hasDone: false }, { sort
 
 module.exports = {
     getUser,
+    getUsersInProcess,
     setUserInProcess,
     setUserHasDone,
     setUserHasError,

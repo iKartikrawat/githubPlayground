@@ -1,6 +1,8 @@
 const { fetchAllCommits } = require("../github_apis/fetchCommit");
 const { fetchAllRepos } = require("../github_apis/fetchRepo");
-const { setUserHasDone, getNextUserToProcess, setUserInProcess, setUserHasError } = require("../model/userModel");
+const { deleteUserCommits } = require("../model/commitModel");
+const { deleteUserRepos } = require("../model/repoModel");
+const { setUserHasDone, getNextUserToProcess, setUserInProcess, setUserHasError, getUsersInProcess } = require("../model/userModel");
 
 const QueueStatus = {
     isBusy: false,
@@ -9,6 +11,11 @@ const QueueStatus = {
 
 const isQueueBusy = () => QueueStatus.isBusy;
 
+const handleErrorUser=async(username,message)=>{
+    await setUserHasError(username,message);
+    deleteUserCommits(username)
+    deleteUserRepos(username)
+}
 
 /* to manage fetch processes for users linearly */
 const startProcessForNextUser = async () => {
@@ -31,15 +38,22 @@ const startProcessForNextUser = async () => {
                 startProcessForNextUser();
             },
             async (error) => {
-                await setUserHasError(user.username);
+                await handleErrorUser(user.username,error.message);
                 startProcessForNextUser();
             }
-        );
-        return user.username;
+            );
+            return user.username;
+        }
     }
-}
-
-module.exports = {
-    isQueueBusy,
-    startProcessForNextUser
-}
+    
+    const handleIncompleteRequests=async()=>{
+        let users=await getUsersInProcess();
+        await Promise.all(users.map((user)=>handleErrorUser(user.username,"System shut down!")));
+    }
+    
+    module.exports = {
+        isQueueBusy,
+        startProcessForNextUser,
+        handleErrorUser,
+        handleIncompleteRequests
+    }

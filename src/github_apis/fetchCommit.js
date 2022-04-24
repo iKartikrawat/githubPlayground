@@ -3,7 +3,6 @@ const { makeSearchReq } = require("./makeSearchRequest");
 
 const MAX_COUNT = 100;
 
-
 /* generates path for search api  */
 const fetchCommits = (userName, pageNum) => makeSearchReq(
     "commits?q=" +

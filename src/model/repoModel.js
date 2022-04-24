@@ -20,8 +20,13 @@ const getUserRepos = async (username) => {
     return allRepos;
 };
 
+const deleteUserRepos=async(username)=>{
+    await reposcol().deleteMany({username});
+}
+
 
 module.exports = {
     insertRepos,
-    getUserRepos
+    getUserRepos,
+    deleteUserRepos
 }

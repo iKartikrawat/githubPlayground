@@ -21,8 +21,12 @@ const getUserCommits = async (username) => {
     return allCommits;
 };
 
+const deleteUserCommits=async(username)=>{
+    await commitscol().deleteMany({username})
+}
+
 module.exports = {
     insertCommits,
     getUserCommits,
-
+    deleteUserCommits
 }
